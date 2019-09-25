@@ -3,6 +3,7 @@ package dev.lukeb.todolist;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -24,7 +25,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btnNewNote).setOnClickListener(this);
         findViewById(R.id.btnDeleteNote).setOnClickListener(this);
 
-
     }
 
     @Override
@@ -32,6 +32,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             //If new Note, call createNewNote()
             case R.id.btnNewNote:
+//                if(Build. >= 23){
+//                      // Create alarm in the new way, need to give it AlarmReceiver.class which is made by new -> other -> BroadcastReceiver
+//                } else {
+//
+//                }
                 createNewNote();
                 break;
             //If delete note, call deleteNewestNote()
