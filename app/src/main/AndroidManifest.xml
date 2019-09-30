@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.csce4623.ahnelson.todolist">
+    package="dev.lukeb.todolist">
 
     <application
         android:allowBackup="true"
@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="dev.lukeb.todolist.HomeActivity">
+        <activity android:name="dev.lukeb.todolist.ListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,9 +17,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="dev.lukeb.todolist.NoteActivity">
+        </activity>
+
         <provider
             android:name="dev.lukeb.todolist.ToDoProvider"
-            android:authorities="com.csce4623.ahnelson.todolist.todoprovider"
+            android:authorities="dev.lukeb.todolist.ToDoProvider"
             android:enabled="true"
             android:exported="true"></provider>
     </application>

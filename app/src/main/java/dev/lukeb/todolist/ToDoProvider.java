@@ -29,6 +29,8 @@ public class ToDoProvider extends ContentProvider {
     public static final String TODO_TABLE_COL_ID = "_ID";
     public static final String TODO_TABLE_COL_TITLE = "TITLE";
     public static final String TODO_TABLE_COL_CONTENT = "CONTENT";
+    public static final boolean TODO_TABLE_COL_DONE = false;
+    public static final String TODO_TABLE_COL_DUE_DATE = "DUE_DATE";
     // Add columns if wanting to create other columns in the DB
 
     //Table create string based on column names
@@ -37,7 +39,10 @@ public class ToDoProvider extends ContentProvider {
             "(" +                           // The columns in the table
             TODO_TABLE_COL_ID + " INTEGER PRIMARY KEY, " +
             TODO_TABLE_COL_TITLE + " TEXT," +
-            TODO_TABLE_COL_CONTENT + " TEXT)";
+            TODO_TABLE_COL_CONTENT + " TEXT," +
+            TODO_TABLE_COL_DONE + " BOOLEAN," +
+            TODO_TABLE_COL_DUE_DATE + " TEXT)";
+
 
     //URI Matcher object to facilitate switch cases between URIs
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);

@@ -1,30 +1,56 @@
 package dev.lukeb.todolist;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.csce4623.ahnelson.todolist.R;
+import java.util.ArrayList;
+
+import dev.lukeb.todolist.model.Todo;
+
 
 //Create HomeActivity and implement the OnClick listener
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
+public class ListActivity extends AppCompatActivity implements View.OnClickListener{
+
+    private static final String TAG = "ListActivity";
+
+    ArrayList<Todo> todos;
+    TodoAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_list);
+
         initializeComponents();
+        initRecyclerView();
     }
+
     //Set the OnClick Listener for buttons
     void initializeComponents(){
         findViewById(R.id.btnNewNote).setOnClickListener(this);
         findViewById(R.id.btnDeleteNote).setOnClickListener(this);
+    }
 
+    void initRecyclerView(){
+        // Bind the recycler view
+        RecyclerView rvTodos =  findViewById(R.id.rvTodos);
+
+        todos = new ArrayList<>();
+        todos.add(new Todo("Title", "Description", false));
+        adapter = new TodoAdapter(this, todos);
+
+        rvTodos.setAdapter(adapter);
+        rvTodos.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -32,12 +58,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             //If new Note, call createNewNote()
             case R.id.btnNewNote:
-//                if(Build. >= 23){
+//                if(Build.VERSION >= 23){
 //                      // Create alarm in the new way, need to give it AlarmReceiver.class which is made by new -> other -> BroadcastReceiver
 //                } else {
 //
 //                }
                 createNewNote();
+                Log.d(TAG, "onClick: Starting NoteActivity from ListActivity OnClick");
+                Intent intent = new Intent(this, NoteActivity.class);
+                startActivity(intent);
                 break;
             //If delete note, call deleteNewestNote()
             case R.id.btnDeleteNote:
@@ -51,6 +80,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     //Create a new note with the title "New Note" and content "Note Content"
     void createNewNote(){
+        todos.add(new Todo("New Title", "New Desc", false));
+        adapter.notifyItemInserted(adapter.getItemCount());
+
         //Create a ContentValues object
         ContentValues myCV = new ContentValues();
         //Put key_value pairs based on the column names, and the values
