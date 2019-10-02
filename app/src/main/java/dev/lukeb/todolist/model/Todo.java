@@ -1,5 +1,7 @@
 package dev.lukeb.todolist.model;
 
+import android.os.Parcelable;
+
 public class Todo {
 
     String title;

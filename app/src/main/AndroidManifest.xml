@@ -22,7 +22,7 @@
 
         <provider
             android:name="dev.lukeb.todolist.ToDoProvider"
-            android:authorities="dev.lukeb.todolist.ToDoProvider"
+            android:authorities="dev.lukeb.todolist"
             android:enabled="true"
             android:exported="true"></provider>
     </application>

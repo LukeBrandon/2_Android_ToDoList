@@ -13,25 +13,22 @@ import android.text.TextUtils;
 import android.util.Log;
 
 public class ToDoProvider extends ContentProvider {
-    //LOGTAG set to Class Name
-    private static String LOGTAG = "ToDoProvider:";
-    // Database Name for SQLITE DB
+    private static final String TAG = "ToDoProvider";
+
     private static final String DBNAME = "ToDoDB";
     // Authority is the package name
-    private static final String AUTHORITY = "dev.lukeb.todolist.todoprovider";
-    //TABLE_NAME is defined as ToDoList
-    private static final String TABLE_NAME = "ToDoList";
-    //Create a CONTENT_URI for use by other classes
-    public static final Uri CONTENT_URI =
-            Uri.parse("content://" + AUTHORITY + "/"+TABLE_NAME);
+    private static final String AUTHORITY = "dev.lukeb.todolist";
 
-    //Column names for the ToDoList Table
+    private static final String TABLE_NAME = "ToDoList";
+
     public static final String TODO_TABLE_COL_ID = "_ID";
     public static final String TODO_TABLE_COL_TITLE = "TITLE";
     public static final String TODO_TABLE_COL_CONTENT = "CONTENT";
-    public static final boolean TODO_TABLE_COL_DONE = false;
+    //public static final boolean TODO_TABLE_COL_DONE = false;
     public static final String TODO_TABLE_COL_DUE_DATE = "DUE_DATE";
-    // Add columns if wanting to create other columns in the DB
+
+    public static final Uri CONTENT_URI =
+            Uri.parse("content://" + AUTHORITY + "/"+TABLE_NAME);
 
     //Table create string based on column names
     private static final String SQL_CREATE_MAIN = "CREATE TABLE " +
@@ -40,7 +37,7 @@ public class ToDoProvider extends ContentProvider {
             TODO_TABLE_COL_ID + " INTEGER PRIMARY KEY, " +
             TODO_TABLE_COL_TITLE + " TEXT," +
             TODO_TABLE_COL_CONTENT + " TEXT," +
-            TODO_TABLE_COL_DONE + " BOOLEAN," +
+            //TODO_TABLE_COL_DONE + " BOOLEAN," +
             TODO_TABLE_COL_DUE_DATE + " TEXT)";
 
 
@@ -54,6 +51,14 @@ public class ToDoProvider extends ContentProvider {
         sUriMatcher.addURI(AUTHORITY,TABLE_NAME,1);
         //Match to the authority and the table name, and an ID, assign 2
         sUriMatcher.addURI(AUTHORITY,TABLE_NAME+"/#",2);
+        onCreate();
+    }
+
+    @Override
+    public boolean onCreate() {
+        Log.d(TAG, "onCreate: Creating mOpenHelper");
+        mOpenHelper = new MainDatabaseHelper(getContext());
+        return true;
     }
 
     //Delete functionality for the Content Provider
@@ -98,7 +103,7 @@ public class ToDoProvider extends ContentProvider {
                 break;
             default:
                 //Otherwise, error is thrown
-                Log.e(LOGTAG, "URI not recognized " + uri);
+                Log.e(TAG, "URI not recognized " + uri);
         }
         //Insert into the table, return the id of the inserted row
         long id = mOpenHelper.getWritableDatabase().insert(TABLE_NAME,null,values);
@@ -106,22 +111,6 @@ public class ToDoProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri,null);
         //Return the URI with the ID at the end
         return Uri.parse(CONTENT_URI+"/" + id);
-    }
-
-
-    //Create the Content Provider
-    //Checks to make sure that there is a database and a table
-    //If not, creates the table
-    //All implemented in the MainDatabaseHelper Class
-    @Override
-    public boolean onCreate() {
-        /*
-         * Creates a new helper object. This method always returns quickly.
-         * Notice that the database itself isn't created or opened
-         * until SQLiteOpenHelper.getWritableDatabase is called
-         */
-        mOpenHelper = new MainDatabaseHelper(getContext());
-        return true;
     }
 
     //Query Functionality for the Content Provider
@@ -136,22 +125,22 @@ public class ToDoProvider extends ContentProvider {
         queryBuilder.setTables(TABLE_NAME);
 
         //Match on either the URI with or without an ID
-        switch (sUriMatcher.match(uri)){
+        switch (sUriMatcher.match(uri)) {
             case 1:
                 //If no ID, and no sort order, specify the sort order as by ID Ascending
-                if(TextUtils.isEmpty(sortOrder)) sortOrder="_ID ASC";
+                if (TextUtils.isEmpty(sortOrder)) sortOrder = "_ID ASC";
                 break;
             case 2:
                 //Otherwise, set the selection of the URI to the ID
                 selection = selection + "_ID = " + uri.getLastPathSegment();
                 break;
             default:
-                Log.e(LOGTAG, "URI not recognized " + uri);
+                Log.e(TAG, "URI not recognized " + uri);
         }
         //Query the database based on the columns to be returned, the selection criteria and
         // arguments, and the sort order
-        Cursor cursor = queryBuilder.query(mOpenHelper.getWritableDatabase(),projection,selection,
-                selectionArgs,null,null,sortOrder);
+        Cursor cursor = queryBuilder.query(mOpenHelper.getWritableDatabase(), projection, selection,
+                selectionArgs, null, null, sortOrder);
         //Return the cursor object
         return cursor;
     }
@@ -184,31 +173,19 @@ public class ToDoProvider extends ContentProvider {
     }
 
 
-    //Class for creating an instance of a SQLiteOpenHelper
-    //Performs creation of the SQLite Database if none exists
     protected static final class MainDatabaseHelper extends SQLiteOpenHelper {
-        /*
-         * Instantiates an open helper for the provider's SQLite data repository
-         * Do not do database creation and upgrade here.
-         */
+
         MainDatabaseHelper(Context context) {
             super(context, DBNAME, null, 1);
         }
 
-        /*
-         * Creates the data repository. This is called when the provider attempts to open the
-         * repository and SQLite reports that it doesn't exist.
-         */
         public void onCreate(SQLiteDatabase db) {
-
-            // Creates the main table
             db.execSQL(SQL_CREATE_MAIN);
         }
 
         public void onUpgrade(SQLiteDatabase db, int int1, int int2){
-            db.execSQL("DROP TABLE IF EXISTS ToDoList");
+            db.execSQL("DROP TABLE IF EXISTS " + ToDoProvider.TABLE_NAME);
             onCreate(db);
-
         }
     }
 
