@@ -61,30 +61,32 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
 
         // Update the todos from the , clear then repopulate with newest data
         todos.clear();
+        adapter.notifyDataSetChanged();     // This forces the recycler veiw to update
 
         //Set the projection for the columns to be returned
         String[] projection = {
                 ToDoProvider.TODO_TABLE_COL_ID,
                 ToDoProvider.TODO_TABLE_COL_TITLE,
-                ToDoProvider.TODO_TABLE_COL_CONTENT};
+                ToDoProvider.TODO_TABLE_COL_CONTENT,
+                ToDoProvider.TODO_TABLE_COL_DUE_DATE};
 
         //Perform a query to get all rows in the DB
         Cursor mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,null);
 
+        int idColumnIndex = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_ID);
         int titleColumnIndex=mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_TITLE);
         int contentColumnIndex = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_CONTENT);
+        int dateColumnIndex = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DUE_DATE);
 
         mCursor.moveToFirst();
         while(!mCursor.isAfterLast()) {
             Log.d(TAG, "onResume: title from DB: " + mCursor.getString(titleColumnIndex));
             Log.d(TAG, "onResume: content from DB: " + mCursor.getString(contentColumnIndex));
-            Todo newTerm = new Todo(mCursor.getString(titleColumnIndex), mCursor.getString(contentColumnIndex), false); // SHOULD GET TEH VALUE FROM THE DB
-            Log.d(TAG, "onResume: added term to todos");
+            Todo newTerm = new Todo(mCursor.getInt(idColumnIndex), mCursor.getString(titleColumnIndex), mCursor.getString(contentColumnIndex), mCursor.getString(dateColumnIndex), false); // SHOULD GET TEH VALUE FROM THE DB
             todos.add(newTerm);
             mCursor.moveToNext();
         }
     }
-
 
     @Override
     public void onClick(View v){
@@ -96,11 +98,11 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
 //                } else {
 //
 //                }
-                //createNewNote();
                 Log.d(TAG, "onClick: Starting NoteActivity from ListActivity OnClick");
                 Intent intent = new Intent(this, NoteActivity.class);
+                intent.putExtra("isUpdate", false);
 
-                startActivityForResult(intent, 1);
+                startActivity(intent);
                 break;
             //If delete note, call deleteNewestNote()
             case R.id.btnDeleteNote:
@@ -113,47 +115,6 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1 && resultCode == RESULT_OK){
-            String title = data.getStringExtra("todo_title");
-            String content = data.getStringExtra("todo_content");
-            Log.d(TAG, "onActivityResult: received from noteActivity title: " + title + " // content: " + content);
-            Todo newTodo = new Todo(title, content, false); // false is temporary until i add the booleans in the Db
-            todos.add(newTodo);
-            adapter.notifyItemInserted(adapter.getItemCount()-1);
-        }
-    }
-
-    //Create a new note with the title "New Note" and content "Note Content"
-    void createNewNote(){
-//        todos.add(new Todo());
-//        adapter.notifyItemInserted(adapter.getItemCount());
-
-        //Create a ContentValues object
-        ContentValues myCV = new ContentValues();
-
-        //Put key_value pairs based on the column names, and the values
-        myCV.put(ToDoProvider.TODO_TABLE_COL_TITLE,"New Note");
-        myCV.put(ToDoProvider.TODO_TABLE_COL_CONTENT,"Note Content");
-        myCV.put(ToDoProvider.TODO_TABLE_COL_DUE_DATE, "9/2/19");
-        //myCV.put(ToDoProvider.TODO_TABLE_COL_DONE, false);
-
-        //Perform the insert function using the ContentProvider
-        getContentResolver().insert(ToDoProvider.CONTENT_URI,myCV);
-
-        //Set the projection for the columns to be returned
-        String[] projection = {
-                ToDoProvider.TODO_TABLE_COL_ID,
-                ToDoProvider.TODO_TABLE_COL_TITLE,
-                ToDoProvider.TODO_TABLE_COL_CONTENT};
-
-        //Perform a query to get all rows in the DB
-        Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,null);
-
-        Toast.makeText(getApplicationContext(),Integer.toString(myCursor.getCount()),Toast.LENGTH_LONG).show();
-    }
 
     //Delete the newest note placed into the database
     void deleteNewestNote(){
@@ -161,7 +122,8 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         String[] projection = {
                 ToDoProvider.TODO_TABLE_COL_ID,
                 ToDoProvider.TODO_TABLE_COL_TITLE,
-                ToDoProvider.TODO_TABLE_COL_CONTENT};
+                ToDoProvider.TODO_TABLE_COL_CONTENT,
+                ToDoProvider.TODO_TABLE_COL_DUE_DATE};
 
         //Perform the query, with ID Descending
         Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,"_ID DESC");

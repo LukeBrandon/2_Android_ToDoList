@@ -28,7 +28,7 @@ public class ToDoProvider extends ContentProvider {
     public static final String TODO_TABLE_COL_DUE_DATE = "DUE_DATE";
 
     public static final Uri CONTENT_URI =
-            Uri.parse("content://" + AUTHORITY + "/"+TABLE_NAME);
+            Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
 
     //Table create string based on column names
     private static final String SQL_CREATE_MAIN = "CREATE TABLE " +
@@ -151,14 +151,18 @@ public class ToDoProvider extends ContentProvider {
                       String[] selectionArgs) {
         switch (sUriMatcher.match(uri)){
             case 1:
+                Log.d(TAG, "update: Inside case 1");
                 //Allow update based on multiple selections
                 break;
             case 2:
+                Log.d(TAG, "update: Inside case 2");
                 //Allow updates based on a single ID
                 String id = uri.getPathSegments().get(1);
+                Log.d(TAG, "update: Id is: " + id);
                 selection = TODO_TABLE_COL_ID + "=" + id +
                         (!TextUtils.isEmpty(selection) ?
                         "AND (" + selection + ")" : "");
+                Log.d(TAG, "update: Selection is " + selection);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);

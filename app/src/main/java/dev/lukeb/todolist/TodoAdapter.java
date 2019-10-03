@@ -60,6 +60,9 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>{
                 Intent intent = new Intent(mContext, NoteActivity.class);
                 intent.putExtra("todo_title", mTodos.get(position).getTitle());
                 intent.putExtra("todo_description", mTodos.get(position).getDescription());
+                intent.putExtra("todo_date", mTodos.get(position).getDate());
+                intent.putExtra("todo_id", position+1);  // position+1 is id in the DB
+                intent.putExtra("isUpdate", true);
                 mContext.startActivity(intent);
             }
         });
@@ -71,9 +74,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>{
         return mTodos.size();
     }
 
-    public void addTodo(Todo todo){
-        this.mTodos.add(todo);
-    }
+
 
 
     // Used to hold each individual recycler view view (list components)
