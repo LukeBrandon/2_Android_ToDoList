@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="60dp"
     android:orientation="horizontal"
     android:id="@+id/parent_layout">
 
@@ -9,14 +9,19 @@
             android:id="@+id/todo_name"
             android:layout_width="300dp"
             android:layout_height="match_parent"
-            android:text="Task Name">
+            android:text="Task Name"
+            android:gravity="center_vertical"
+            android:textSize="20dp">
         </TextView>
 
-        <Button
-            android:id="@+id/todo_button"
+        <CheckBox
+            android:id="@+id/todo_doneCheckBox"
             android:layout_width="100dp"
             android:layout_height="match_parent"
-            android:text="Done"/>
+            android:text="done"
+            android:textSize="20dp"
+            ></CheckBox>
+
 
 
 </LinearLayout>

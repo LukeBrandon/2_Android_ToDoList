@@ -21,7 +21,7 @@
         </activity>
 
         <provider
-            android:name="dev.lukeb.todolist.ToDoProvider"
+            android:name="dev.lukeb.todolist.model.ToDoProvider"
             android:authorities="dev.lukeb.todolist"
             android:enabled="true"
             android:exported="true"></provider>

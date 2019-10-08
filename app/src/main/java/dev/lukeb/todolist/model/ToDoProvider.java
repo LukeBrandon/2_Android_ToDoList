@@ -1,4 +1,4 @@
-package dev.lukeb.todolist;
+package dev.lukeb.todolist.model;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -24,7 +24,7 @@ public class ToDoProvider extends ContentProvider {
     public static final String TODO_TABLE_COL_ID = "_ID";
     public static final String TODO_TABLE_COL_TITLE = "TITLE";
     public static final String TODO_TABLE_COL_CONTENT = "CONTENT";
-    //public static final boolean TODO_TABLE_COL_DONE = false;
+    public static final String TODO_TABLE_COL_DONE = "DONE";
     public static final String TODO_TABLE_COL_DUE_DATE = "DUE_DATE";
 
     public static final Uri CONTENT_URI =
@@ -37,7 +37,7 @@ public class ToDoProvider extends ContentProvider {
             TODO_TABLE_COL_ID + " INTEGER PRIMARY KEY, " +
             TODO_TABLE_COL_TITLE + " TEXT," +
             TODO_TABLE_COL_CONTENT + " TEXT," +
-            //TODO_TABLE_COL_DONE + " BOOLEAN," +
+            TODO_TABLE_COL_DONE + " BOOLEAN," +
             TODO_TABLE_COL_DUE_DATE + " TEXT)";
 
 
@@ -151,18 +151,15 @@ public class ToDoProvider extends ContentProvider {
                       String[] selectionArgs) {
         switch (sUriMatcher.match(uri)){
             case 1:
-                Log.d(TAG, "update: Inside case 1");
                 //Allow update based on multiple selections
                 break;
             case 2:
-                Log.d(TAG, "update: Inside case 2");
                 //Allow updates based on a single ID
                 String id = uri.getPathSegments().get(1);
                 Log.d(TAG, "update: Id is: " + id);
                 selection = TODO_TABLE_COL_ID + "=" + id +
                         (!TextUtils.isEmpty(selection) ?
                         "AND (" + selection + ")" : "");
-                Log.d(TAG, "update: Selection is " + selection);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -180,7 +177,7 @@ public class ToDoProvider extends ContentProvider {
     protected static final class MainDatabaseHelper extends SQLiteOpenHelper {
 
         MainDatabaseHelper(Context context) {
-            super(context, DBNAME, null, 1);
+            super(context, DBNAME, null, 5);
         }
 
         public void onCreate(SQLiteDatabase db) {
@@ -191,6 +188,7 @@ public class ToDoProvider extends ContentProvider {
             db.execSQL("DROP TABLE IF EXISTS " + ToDoProvider.TABLE_NAME);
             onCreate(db);
         }
+
     }
 
 }
