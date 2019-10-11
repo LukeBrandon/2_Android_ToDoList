@@ -7,7 +7,7 @@
 
         <TextView
             android:id="@+id/todo_name"
-            android:layout_width="300dp"
+            android:layout_width="250dp"
             android:layout_height="match_parent"
             android:text="Task Name"
             android:gravity="center_vertical"

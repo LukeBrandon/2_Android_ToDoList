@@ -48,7 +48,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>{
     // Involves populating data into the item through holder
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        Log.d(TAG, "onBindViewHolder: called");
 
         // Set item views based on the data model
         viewHolder.todoTextView.setText(mTodos.get(position).getTitle());

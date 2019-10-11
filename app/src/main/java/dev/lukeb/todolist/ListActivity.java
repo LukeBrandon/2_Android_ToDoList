@@ -1,7 +1,10 @@
 package dev.lukeb.todolist;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import dev.lukeb.todolist.model.ToDoProvider;
 import dev.lukeb.todolist.model.Todo;
 import dev.lukeb.todolist.view.TodoAdapter;
+import dev.lukeb.todolist.util.ConnectivityReceiver;
 
 
 //Create HomeActivity and implement the OnClick listener
@@ -25,6 +29,7 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<Todo> todos;
     TodoAdapter adapter;
     ToDoProvider toDoProvider;
+    ConnectivityReceiver connectivityReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +38,17 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
 
         toDoProvider = new ToDoProvider();
 
+        connectivityReceiver = new ConnectivityReceiver();
+        registerNetworkBroadcastForNougat();
+
         initializeComponents();
         initRecyclerView();
+    }
+
+    private void registerNetworkBroadcastForNougat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            registerReceiver(connectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
     }
 
     void initializeComponents(){
@@ -103,6 +117,13 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 throw new UnsupportedOperationException("ERROR, something that should not have been called was called in the lsit activity onClick()");
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        unregisterReceiver(connectivityReceiver);
+
     }
 
 

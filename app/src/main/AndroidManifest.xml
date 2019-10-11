@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dev.lukeb.todolist">
 
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -14,30 +19,33 @@
         <activity android:name=".ListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".NoteActivity"
-            android:parentActivityName=".ListActivity"></activity>
+            android:parentActivityName=".ListActivity">
+        </activity>
 
         <provider
             android:name=".model.ToDoProvider"
             android:authorities="dev.lukeb.todolist"
             android:enabled="true"
-            android:exported="true" />
-
-        <receiver android:name=".util.NotificationHandler" />
-
-        <receiver
-            android:name=".util.ConnectivityReceiver"
-            android:enabled="true"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+        </provider>
+
+        <receiver android:name=".util.NotificationHandler">
+        </receiver>
+
+        <receiver android:name="dev.lukeb.todolist.util.ConnectivityReceiver" >
+            <intent-filter android:priority="100">
+                <action android:name="android.net.wifi.STATE_CHANGE" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
+
+
     </application>
 
 </manifest>

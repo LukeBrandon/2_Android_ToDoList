@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -38,7 +39,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
     TextView etNoteTitle;
     EditText etNoteContent;
     EditText etDatePicker;
-    Button btnCancel;
+    ImageView btnCancel;
     Button btnSave;
     Button btnDelete;
     CheckBox cbDone;
@@ -62,7 +63,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         etNoteContent = (EditText) findViewById(R.id.etNoteContent);
         etDatePicker = (EditText) findViewById(R.id.dpDatePicker);
         btnSave = (Button) findViewById(R.id.btnSave);
-        btnCancel = (Button) findViewById(R.id.btnCancel);
+        btnCancel = (ImageView) findViewById(R.id.btnCancel);
         btnDelete = (Button) findViewById(R.id.btnDelete);
         cbDone = (CheckBox) findViewById(R.id.cbDone);
         tpTimePicker = (TimePicker) findViewById(R.id.tpTimePicker);
@@ -117,6 +118,9 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                 // Update in the DB
                 getContentResolver().update(uri, myCV, null, null);
 
+                // Delete old, scheduled notification
+                scheduleNotification(etNoteTitle.getText().toString(), etNoteContent.getText().toString(), idInDb, true);
+
             } else{
                 // Inserting new note into DB
                 getContentResolver().insert(ToDoProvider.CONTENT_URI, myCV);
@@ -165,9 +169,18 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
             cbDone.setChecked(intent.getBooleanExtra("todo_done", false));
             this.isUpdate = intent.getBooleanExtra("isUpdate", false);
             this.position = intent.getIntExtra("todo_position", -1);
+
         } else {
             Log.d(TAG, "getIntentIfPossible: Intent has no extras");
         }
+
+        Log.d(TAG, "getIntentFromListActivity: isUpdate is: " + this.isUpdate);
+
+        if(!this.isUpdate) {
+            btnDelete.setVisibility(View.INVISIBLE);
+            btnDelete.setClickable(false);
+        }
+
 
     }
 
