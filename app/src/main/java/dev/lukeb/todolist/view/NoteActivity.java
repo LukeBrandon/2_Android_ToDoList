@@ -1,4 +1,4 @@
-package dev.lukeb.todolist;
+package dev.lukeb.todolist.view;
 
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
@@ -27,6 +27,8 @@ import androidx.core.app.NotificationCompat;
 
 import java.util.Calendar;
 
+import dev.lukeb.todolist.App;
+import dev.lukeb.todolist.R;
 import dev.lukeb.todolist.model.ToDoProvider;
 import dev.lukeb.todolist.util.NotificationHandler;
 
@@ -69,10 +71,12 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         tpTimePicker = (TimePicker) findViewById(R.id.tpTimePicker);
         calendar = Calendar.getInstance();
 
+        // Cancel button saves nothing, just closes activity
         btnCancel.setOnClickListener(v -> {
                 finish();
         });
 
+        // onCLick for delete button
         btnDelete.setOnClickListener(v -> {
             Log.d(TAG, "onClick: Deleting note with position in recycler view of " + position);
 
@@ -88,15 +92,16 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
             // Cancel the notification
             scheduleNotification(etNoteTitle.getText().toString(), etNoteContent.getText().toString(), idInDb, true);
 
+            // If it worked, finish the activity, otherwise notify user
             if (didWork == 1) {
                 Log.d(TAG, "onClick: Deletion of note position: " + position + " worked!");
-                Toast.makeText(getApplicationContext(), "Deleted Note " + position, Toast.LENGTH_LONG).show();
                 finish();
             } else {
                 Toast.makeText(getApplicationContext(), "Failed to delete note", Toast.LENGTH_LONG).show();
             }
         });
 
+        // onClick for save button
         btnSave.setOnClickListener(v-> {
             Log.d(TAG, "onClick: Saving note with title: \"" + etNoteTitle.getText() + "\" and content: \"" + etNoteContent.getText() + "\"");
 
@@ -135,6 +140,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
             finish();
         });
 
+        // Callback function that is called when click "ok" on date picker dialog
         final DatePickerDialog.OnDateSetListener setDate = (view, year, month, day) -> {
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, month);
@@ -144,10 +150,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
             displayDate(calendar.getTimeInMillis());
         };
 
+        // Onclick method for the displayed due date
         etDatePicker.setOnClickListener( v -> {
-            // Onclick method causes the datepicker to pop up
+
+            // Gets values from the calendar object that is either already initialized, or automatically set to current day for a new note
             new DatePickerDialog(this, setDate,
-                // Get all of these values from the intent somehow
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH))
@@ -155,11 +162,12 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    // Gets the data from the intent that is passed when clicking on an object in the recycler view
     private void getIntentFromListActivity(){
 
         Intent intent = getIntent();
 
-        // Setting all of the UI elements when opening up a NoteActivity to update
+        // Setting all of the UI elements and member variables when opening up a NoteActivity to update
         if(intent.hasExtra("todo_title") && intent.hasExtra("todo_description") && intent.hasExtra("todo_position")
                                             && intent.hasExtra("isUpdate") && intent.hasExtra("todo_done")){
 
@@ -170,11 +178,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
             this.isUpdate = intent.getBooleanExtra("isUpdate", false);
             this.position = intent.getIntExtra("todo_position", -1);
 
-        } else {
-            Log.d(TAG, "getIntentIfPossible: Intent has no extras");
         }
-
-        Log.d(TAG, "getIntentFromListActivity: isUpdate is: " + this.isUpdate);
 
         if(!this.isUpdate) {
             btnDelete.setVisibility(View.INVISIBLE);
@@ -257,6 +261,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    // Adds the time from the timepicker to the calendar so can be used to set alarm
     private void saveDueTimeInCalendar(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             calendar.set(Calendar.HOUR_OF_DAY, this.tpTimePicker.getHour());
@@ -264,6 +269,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    // Updates the textview that is responsible for showing the due date
     private void displayDate(long dateInMillis){
 
         calendar.setTimeInMillis(dateInMillis);

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/parent_layout"
-    tools:context="dev.lukeb.todolist.ListActivity">
+    tools:context="dev.lukeb.todolist.view.ListActivity">
 
 <!--    <Button-->
 <!--        android:layout_width="70dp"-->

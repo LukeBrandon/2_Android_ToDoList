@@ -13,11 +13,9 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import dev.lukeb.todolist.NoteActivity;
 import dev.lukeb.todolist.R;
 import dev.lukeb.todolist.model.*;
 

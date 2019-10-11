@@ -1,4 +1,4 @@
-package dev.lukeb.todolist;
+package dev.lukeb.todolist.view;
 
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import dev.lukeb.todolist.R;
 import dev.lukeb.todolist.model.ToDoProvider;
 import dev.lukeb.todolist.model.Todo;
-import dev.lukeb.todolist.view.TodoAdapter;
 import dev.lukeb.todolist.util.ConnectivityReceiver;
 
 
@@ -38,6 +38,7 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
 
         toDoProvider = new ToDoProvider();
 
+        // Init the receiver for connectivity changes
         connectivityReceiver = new ConnectivityReceiver();
         registerNetworkBroadcastForNougat();
 
@@ -45,18 +46,25 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         initRecyclerView();
     }
 
+    // Register the connectivity receiver
     private void registerNetworkBroadcastForNougat() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             registerReceiver(connectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
     }
 
+    // Initialize UI element onClick method
     void initializeComponents(){
-        findViewById(R.id.btnNewNote).setOnClickListener(this);
+        findViewById(R.id.btnNewNote).setOnClickListener(v -> {
+            Intent intent = new Intent(this, NoteActivity.class);
+            intent.putExtra("isUpdate", false);
+
+            startActivity(intent);
+        });
     }
 
+    // Bind the recycler view with arraylist of todos and the adapter
     void initRecyclerView(){
-        // Bind the recycler view
         RecyclerView rvTodos =  findViewById(R.id.rvTodos);
 
         todos = new ArrayList<>();
@@ -71,7 +79,7 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         Log.d(TAG, "onResume: Getting updated Todos from SQLite DB");
 
-        // Update the todos from the , clear then repopulate with newest data
+        // Clear then repopulate with newest data = updateing recycler view
         todos.clear();
         adapter.notifyDataSetChanged();     // This forces the recycler veiw to update
 
@@ -86,12 +94,14 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         //Perform a query to get all rows in the DB
         Cursor mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,null);
 
+        // Get columnIndexes of all the data columns in DB
         int idColumnIndex = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_ID);
         int titleColumnIndex = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_TITLE);
         int contentColumnIndex = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_CONTENT);
         int dateColumnIndex = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DUE_DATE);
         int doneColumnIndex = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DONE);
 
+        // Put all of the data from the DB into the ArrayList as Todo objects
         mCursor.moveToFirst();
         while(!mCursor.isAfterLast()) {
             Todo newTerm = new Todo(mCursor.getInt(idColumnIndex), mCursor.getString(titleColumnIndex), mCursor.getString(contentColumnIndex),
@@ -102,28 +112,16 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onClick(View v){
-        switch (v.getId()){
-            //If new Note, call createNewNote()
-            case R.id.btnNewNote:
+    public void onClick(View v){  }
 
-                Intent intent = new Intent(this, NoteActivity.class);
-                intent.putExtra("isUpdate", false);
 
-                startActivity(intent);
-
-                break;
-            //This shouldn't happen
-            default:
-                throw new UnsupportedOperationException("ERROR, something that should not have been called was called in the lsit activity onClick()");
-        }
-    }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
-        unregisterReceiver(connectivityReceiver);
 
+        //Unregisters the connectivity receiver
+        unregisterReceiver(connectivityReceiver);
     }
 
 
