@@ -16,7 +16,7 @@ public class ToDoProvider extends ContentProvider {
     private static final String TAG = "ToDoProvider";
 
     private static final String DBNAME = "ToDoDB";
-    // Authority is the package name
+
     private static final String AUTHORITY = "dev.lukeb.todolist";
 
     private static final String TABLE_NAME = "ToDoList";
@@ -27,8 +27,7 @@ public class ToDoProvider extends ContentProvider {
     public static final String TODO_TABLE_COL_DONE = "DONE";
     public static final String TODO_TABLE_COL_DUE_DATE = "DUE_DATE";
 
-    public static final Uri CONTENT_URI =
-            Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
 
     //Table create string based on column names
     private static final String SQL_CREATE_MAIN = "CREATE TABLE " +
@@ -38,7 +37,7 @@ public class ToDoProvider extends ContentProvider {
             TODO_TABLE_COL_TITLE + " TEXT," +
             TODO_TABLE_COL_CONTENT + " TEXT," +
             TODO_TABLE_COL_DONE + " BOOLEAN," +
-            TODO_TABLE_COL_DUE_DATE + " TEXT)";
+            TODO_TABLE_COL_DUE_DATE + " INTEGER)";
 
 
     //URI Matcher object to facilitate switch cases between URIs
@@ -47,16 +46,18 @@ public class ToDoProvider extends ContentProvider {
 
     //Constructor adds two URIs, use for case statements
     public ToDoProvider() {
+
         //Match to the authority and the table name, assign 1
         sUriMatcher.addURI(AUTHORITY,TABLE_NAME,1);
+
         //Match to the authority and the table name, and an ID, assign 2
         sUriMatcher.addURI(AUTHORITY,TABLE_NAME+"/#",2);
+
         onCreate();
     }
 
     @Override
     public boolean onCreate() {
-        Log.d(TAG, "onCreate: Creating mOpenHelper");
         mOpenHelper = new MainDatabaseHelper(getContext());
         return true;
     }
@@ -76,11 +77,14 @@ public class ToDoProvider extends ContentProvider {
                 //Else, error is thrown
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
+
         //Delete from the database, return integer value for how many rows are deleted
         int deleteCount = mOpenHelper.getWritableDatabase().delete(
                 TABLE_NAME,selection,selectionArgs);
+
         //Notify calling context
         getContext().getContentResolver().notifyChange(uri,null);
+
         //Return number of rows deleted (if any)
         return deleteCount;
     }
@@ -105,10 +109,13 @@ public class ToDoProvider extends ContentProvider {
                 //Otherwise, error is thrown
                 Log.e(TAG, "URI not recognized " + uri);
         }
+
         //Insert into the table, return the id of the inserted row
         long id = mOpenHelper.getWritableDatabase().insert(TABLE_NAME,null,values);
+
         //Notify context of change
         getContext().getContentResolver().notifyChange(uri,null);
+
         //Return the URI with the ID at the end
         return Uri.parse(CONTENT_URI+"/" + id);
     }
@@ -137,10 +144,12 @@ public class ToDoProvider extends ContentProvider {
             default:
                 Log.e(TAG, "URI not recognized " + uri);
         }
+
         //Query the database based on the columns to be returned, the selection criteria and
         // arguments, and the sort order
         Cursor cursor = queryBuilder.query(mOpenHelper.getWritableDatabase(), projection, selection,
                 selectionArgs, null, null, sortOrder);
+
         //Return the cursor object
         return cursor;
     }
@@ -149,6 +158,7 @@ public class ToDoProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
+
         switch (sUriMatcher.match(uri)){
             case 1:
                 //Allow update based on multiple selections
@@ -164,11 +174,14 @@ public class ToDoProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
+
         //Perform updates and return the number that were updated
         int updateCount = mOpenHelper.getWritableDatabase().update(TABLE_NAME,values,
                 selection,selectionArgs);
+
         //Notify the context
         getContext().getContentResolver().notifyChange(uri,null);
+
         //Return the number of rows updated
         return updateCount;
     }

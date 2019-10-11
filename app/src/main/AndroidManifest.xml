@@ -3,28 +3,41 @@
     package="dev.lukeb.todolist">
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="dev.lukeb.todolist.ListActivity">
+
+        <activity android:name=".ListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name="dev.lukeb.todolist.NoteActivity">
-        </activity>
+        <activity
+            android:name=".NoteActivity"
+            android:parentActivityName=".ListActivity"></activity>
 
         <provider
-            android:name="dev.lukeb.todolist.model.ToDoProvider"
+            android:name=".model.ToDoProvider"
             android:authorities="dev.lukeb.todolist"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
+
+        <receiver android:name=".util.NotificationHandler" />
+
+        <receiver
+            android:name=".util.ConnectivityReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

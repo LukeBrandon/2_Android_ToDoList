@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import dev.lukeb.todolist.ListActivity;
+import androidx.recyclerview.widget.RecyclerView;
+
 import dev.lukeb.todolist.NoteActivity;
 import dev.lukeb.todolist.R;
 import dev.lukeb.todolist.model.*;
@@ -27,7 +28,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>{
 
     private List<Todo> mTodos;
     private Context mContext;
-    Context context;
 
     public TodoAdapter(Context context, List<Todo> todos) {
         mTodos = todos;
@@ -50,45 +50,35 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>{
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         Log.d(TAG, "onBindViewHolder: called");
 
-        // Get the data model based on position
-        Todo todo = mTodos.get(position);
-
-        // Set item views based on your views and data model
+        // Set item views based on the data model
         viewHolder.todoTextView.setText(mTodos.get(position).getTitle());
         viewHolder.doneCheckBox.setChecked(mTodos.get(position).getDone());
 
-        viewHolder.doneCheckBox.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Log.d(TAG, "onClick: Clicked checkbox on list screen of position: " + position);
-                ContentValues myCV = new ContentValues();
-                myCV.put(ToDoProvider.TODO_TABLE_COL_TITLE, mTodos.get(position).getTitle());
-                myCV.put(ToDoProvider.TODO_TABLE_COL_CONTENT, mTodos.get(position).getDescription());
-                myCV.put(ToDoProvider.TODO_TABLE_COL_DUE_DATE, mTodos.get(position).getDate());
-                myCV.put(ToDoProvider.TODO_TABLE_COL_DONE, !mTodos.get(position).getDone());
-                Log.d(TAG, "onClick: note get done is: " +  !mTodos.get(position).getDone());
+        viewHolder.doneCheckBox.setOnClickListener(v -> {
 
+            ContentValues myCV = new ContentValues();
+            myCV.put(ToDoProvider.TODO_TABLE_COL_TITLE, mTodos.get(position).getTitle());
+            myCV.put(ToDoProvider.TODO_TABLE_COL_CONTENT, mTodos.get(position).getDescription());
+            myCV.put(ToDoProvider.TODO_TABLE_COL_DUE_DATE, mTodos.get(position).getDate());
+            myCV.put(ToDoProvider.TODO_TABLE_COL_DONE, !mTodos.get(position).getDone());
 
-                // Perform the insert function or update depending on isUpdate
-                int id = getIdAtPosFromDb(position);
+            // Perform the insert function or update depending on isUpdate
+            int id = getIdAtPosFromDb(position);
 
-                // Todo provider update function takes the id to be updated appended to the URI
-                Uri uri = Uri.parse(ToDoProvider.CONTENT_URI.toString() + "/" + id);
-                mContext.getContentResolver().update(uri, myCV, null, null);
+            // Update the db with the new value for done
+            Uri uri = Uri.parse(ToDoProvider.CONTENT_URI.toString() + "/" + id);
+            mContext.getContentResolver().update(uri, myCV, null, null);
 
-                // Update the todos
-                mTodos.get(position).setDone(!mTodos.get(position).getDone());
-            }
+            // Toggle the due date in the todos list
+            mTodos.get(position).setDone(!mTodos.get(position).getDone());
         });
 
 
         // Onclick listener for the individual views in the RecyclerView
-        viewHolder.parentLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view){
+        viewHolder.parentLayout.setOnClickListener(v -> {
+
                 Log.d(TAG, "onClick: clicked on: " + mTodos.get(position));
 
-                Toast.makeText(mContext, mTodos.get(position).getTitle(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(mContext, NoteActivity.class);
                 intent.putExtra("todo_title", mTodos.get(position).getTitle());
                 intent.putExtra("todo_description", mTodos.get(position).getDescription());
@@ -97,7 +87,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder>{
                 intent.putExtra("todo_position", position+1);  // position+1 is id in the DB
                 intent.putExtra("isUpdate", true);
                 mContext.startActivity(intent);
-            }
         });
     }
 

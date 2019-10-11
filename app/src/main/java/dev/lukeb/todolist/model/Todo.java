@@ -8,16 +8,17 @@ public class Todo {
     String title;
     String description;
     boolean done;
-    String date;
+    long date;
 
     public Todo() {
         this.title = "Uninitialized";
         this.description = "Uninitialized";
-        this.date = "Unitialized";
+        this.date = 000000000000;
         this.done = false;
     }
 
-    public Todo(int id, String title, String desc, String date, boolean done){
+    public Todo(int id, String title, String desc, long date, boolean done){
+        this.id = id;
         this.title = title;
         this.description = desc;
         this.date = date;
@@ -33,7 +34,7 @@ public class Todo {
         return this.description;
     }
 
-    public String getDate(){ return this.date; }
+    public long getDate(){ return this.date; }
 
     public boolean getDone(){
         return this.done;
@@ -46,7 +47,7 @@ public class Todo {
 
     public void setDescription(String desc){ this.description = desc; }
 
-    public void setDate(String date) { this.date = date; }
+    public void setDate(long date) { this.date = date; }
 
     public void setDone(boolean done){
         this.done = done;
