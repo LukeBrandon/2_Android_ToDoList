@@ -1,4 +1,4 @@
-package dev.lukeb.todolist.view;
+package dev.lukeb.todolist.viewpresenter;
 
 import android.content.ContentValues;
 import android.content.Context;
